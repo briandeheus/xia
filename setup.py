@@ -10,4 +10,19 @@ setup(
     license='MIT',
     install_requires=['tornado'],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 3 - Alpha',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Frameworks',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 2.7',
+    ],
 )
