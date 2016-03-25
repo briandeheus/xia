@@ -2,28 +2,46 @@ import uuid
 
 
 class BaseField(object):
+
+    def __init__(self):
+        self._value = None
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self.validate(value)
+        self._value = value
+
+    def validate(self, value):
+        raise NotImplementedError
+
     pass
 
 
 class PKField(BaseField):
 
-    def __init__(self, value=None):
-        self.value = value
+    def __init__(self):
 
-    def validate(self):
+        super(PKField, self).__init__()
 
-        if self.value is None:
-            self.value = uuid.uuid4()
+    def validate(self, value):
 
-        return self.value
+        if self._value is None:
+            self._value = uuid.uuid4()
 
 
 class IntegerField(BaseField):
 
-    def __init__(self, min_val, max_val, value=None):
+    def __init__(self, min_val, max_val):
+
+        super(IntegerField, self).__init__()
+
         self.min_val = min_val
         self.max_val = max_val
-        self.value = value
+        self._value = None
 
     def validate(self, value):
 
@@ -38,15 +56,15 @@ class IntegerField(BaseField):
         if value < self.min_val:
             raise ValueError('Value can not be lower than %s' % self.min_val)
 
-        self.value = value
-        return value
-
 
 class StringField(BaseField):
 
-    def __init__(self, max_len, value=None):
+    def __init__(self, max_len):
+
+        super(StringField, self).__init__()
+
         self.max_len = max_len
-        self.value = value
+
 
     def validate(self, value):
 
@@ -54,9 +72,3 @@ class StringField(BaseField):
 
         if len(value) > self.max_len:
             raise ValueError('Value can not be longer than %s' % self.max_len)
-
-        self.value = value
-        return self.value
-
-    def __unicode__(self):
-        return self.value

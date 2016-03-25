@@ -15,10 +15,10 @@ class BaseApi(tornado.web.RequestHandler):
 
     def __init__(self, *args, **kwargs):
 
+        super(BaseApi, self).__init__(*args, **kwargs)
+
         self._error = None
         self._data = None
-
-        super(BaseApi, self).__init__(*args, **kwargs)
 
     def invalid_method(self):
         raise InvalidMethodException(self.request.method)
@@ -71,6 +71,12 @@ class BaseApi(tornado.web.RequestHandler):
     def prepare(self):
 
         if self.request.method == 'GET':
+
+            self.validate()
+            return
+
+        if self.request.body is None or self.request.body == '':
+
             self.validate()
             return
 
