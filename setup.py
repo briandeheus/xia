@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='xia',
-    version='0.0.1',
+    version='0.0.2',
     description='Python Framework for writing APIs',
     url='https://github.com/py-xia/xia',
     author='Brian de Heus',
