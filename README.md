@@ -44,6 +44,103 @@ Or create your own exceptions by extending existing exceptions!
 }
 ```
 
+## Detailed example
+
+```
+class MyApi(xia.api.BaseApi):
+
+    REQUIRED_FIELDS = {
+        'user_id': xia.fields.IntegerField(max_val=10000, min_val=1)
+    }
+
+    def get(self):
+
+        self.set_data({
+            'user': int(self.get_query_argument('user_id'))
+        })
+
+        self.finalize()
+```
+
+Request:
+```
+GET http://localhost/
+```
+
+Response:
+```
+{
+  "error": {
+    "blame": "user_id",
+    "message": "Field is missing",
+    "type": "FieldMissingException"
+  }
+}
+```
+
+Request:
+```
+GET http://localhost/?user_id=10001
+```
+
+Response:
+```
+{
+  "error": {
+    "blame": "user_id",
+    "message": "Value can not be higher than 10000",
+    "type": "ValueInvalidException"
+  }
+}
+```
+
+Request:
+```
+GET http://localhost/?user_id=abc
+```
+
+Response:
+```
+{
+  "error": {
+    "blame": "user_id",
+    "message": "Value is not an integer",
+    "type": "ValueInvalidException"
+  }
+}
+```
+
+Request:
+```
+GET http://localhost/?user_id=-1
+```
+
+Response:
+```
+{
+  "error": {
+    "blame": "user_id",
+    "message": "Value can not be lower than 1",
+    "type": "ValueInvalidException"
+  }
+}
+```
+
+Request:
+```
+GET localhost:8888/?user_id=5
+```
+
+Response:
+```
+{
+  "data": {
+    "user": 5
+  }
+}
+```
+
+
 ## Included Exceptions
 ```
 class NotFoundException(APIException):
