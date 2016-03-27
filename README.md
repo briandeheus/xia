@@ -49,7 +49,7 @@ Or create your own exceptions by extending existing exceptions!
 ```
 class MyApi(xia.api.BaseApi):
 
-    REQUIRED_FIELDS = {
+    REQUIRED_GET_FIELDS = {
         'user_id': xia.fields.IntegerField(max_val=10000, min_val=1)
     }
 
