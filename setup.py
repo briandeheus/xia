@@ -9,12 +9,13 @@ setup(
     author_email='me@brian.jp',
     license='MIT',
     install_requires=['tornado'],
+    test_suite='nose.collector',
     tests_require=['tornado', 'nose'],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
-        #   4 - Beta
+        #   4 - Betat
         #   5 - Production/Stable
         'Development Status :: 3 - Alpha',
 

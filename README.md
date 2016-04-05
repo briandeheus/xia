@@ -1,5 +1,17 @@
 # xia
-Python Framework for writing APIs
+Python helpers for writing APIs in Tornado.
 
 ## Testing
-nosetests --with-coverage --cover-package=xia
+
+### Setup.py
+`python setup.py test`
+
+### With coverage
+
+Be sure to have installed the following PIP packages.
+
+* Tornado
+* Nose
+* Coverage
+
+`nosetests --with-coverage --cover-package=xia`
