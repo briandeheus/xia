@@ -1,5 +1,5 @@
 # xia
-Python helpers for writing APIs in Tornado.
+Helpers for writing APIs in Tornado.
 
 ## Testing
 
