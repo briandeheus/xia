@@ -86,6 +86,9 @@ class ObjectField(BaseField):
 
     def validate(self, value, parent=None):
 
+        if not isinstance(value, dict):
+            raise ValueError('Value is not an object')
+
         for field in self.fields:
 
             try:

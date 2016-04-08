@@ -71,7 +71,7 @@ class BaseApi(tornado.web.RequestHandler):
 
         for field in fields:
 
-            if self.get_argument(field, None) is None:
+            if field not in self.request.arguments:
                 raise FieldMissingException(field)
 
             try:

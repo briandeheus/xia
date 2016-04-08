@@ -169,5 +169,19 @@ class TestApiHandler(TestBase):
             }
         }
 
-        response, obj = self.call_url('/object?test=true', 'POST', json.dumps(invalid_object))
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
+
+        invalid_object = {
+            'object': 'not and object'
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
+
+        invalid_object = {
+            'object': [1, 2, 3]
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
         assert obj['error']['type'] == 'ValueInvalidException'
