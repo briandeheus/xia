@@ -25,6 +25,21 @@ class TestApi(api.BaseApi):
         self.finalize()
 
 
+class ObjectApi(api.BaseApi):
+
+    REQUIRED_POST_FIELDS = {
+        'object': fields.ObjectField(fields={
+            'str': fields.StringField(max_len=128),
+            'object2': fields.ObjectField(fields={
+                'int': fields.IntegerField(max_val=10, min_val=0)
+            })
+        })
+    }
+
+    def post(self):
+        self.set_data('haha')
+        self.finalize()
+
 class TestBase(AsyncHTTPTestCase):
 
     def setUp(self):
@@ -33,8 +48,9 @@ class TestBase(AsyncHTTPTestCase):
     def get_app(self):
         self.app = tornado.web.Application([
             (r'/', TestApi),
+            (r'/object', ObjectApi),
             (r'/404', api.NotFoundApi),
-            (r'/base', api.BaseApi)
+            (r'/base', api.BaseApi),
         ])
 
         return self.app
@@ -129,3 +145,29 @@ class TestApiHandler(TestBase):
 
         response, obj = self.call_url('/base', 'DELETE')
         assert obj['error']['type'] == 'InvalidMethodException'
+
+    def object_api_test(self):
+
+        valid_object = {
+            'object': {
+                'str': 'Hello World',
+                'object2': {
+                    'int': 10
+                }
+            }
+        }
+
+        response, obj = self.call_url('/object?test=true', 'POST', json.dumps(valid_object))
+        assert obj['data'] == 'haha'
+
+        invalid_object = {
+            'object': {
+                'str': 'Hello World',
+                'object2': {
+                    'int': 11
+                }
+            }
+        }
+
+        response, obj = self.call_url('/object?test=true', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
