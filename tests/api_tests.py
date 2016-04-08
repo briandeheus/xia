@@ -7,9 +7,13 @@ import tornado.web
 
 class TestApi(api.BaseApi):
 
-    REQUIRED_FIELDS = {
+    REQUIRED_GET_FIELDS = {
         'string': fields.StringField(max_len=128),
         'integer': fields.IntegerField(max_val=10, min_val=0)
+    }
+
+    REQUIRED_PUT_FIELDS = {
+        'different_string': fields.StringField(max_len=128)
     }
 
     def get(self):
@@ -21,6 +25,21 @@ class TestApi(api.BaseApi):
         self.finalize()
 
 
+class ObjectApi(api.BaseApi):
+
+    REQUIRED_POST_FIELDS = {
+        'object': fields.ObjectField(fields={
+            'str': fields.StringField(max_len=128),
+            'object2': fields.ObjectField(fields={
+                'int': fields.IntegerField(max_val=10, min_val=0)
+            })
+        })
+    }
+
+    def post(self):
+        self.set_data('haha')
+        self.finalize()
+
 class TestBase(AsyncHTTPTestCase):
 
     def setUp(self):
@@ -29,7 +48,9 @@ class TestBase(AsyncHTTPTestCase):
     def get_app(self):
         self.app = tornado.web.Application([
             (r'/', TestApi),
-            (r'/404', api.NotFoundApi)
+            (r'/object', ObjectApi),
+            (r'/404', api.NotFoundApi),
+            (r'/base', api.BaseApi),
         ])
 
         return self.app
@@ -74,6 +95,9 @@ class TestApiHandler(TestBase):
         assert obj['error']['type'] == 'InvalidMethodException'
 
         response, obj = self.call_url('/?string=huehue&integer=5', 'PUT', '{"this": "json"}')
+        assert obj['error']['type'] == 'FieldMissingException'
+
+        response, obj = self.call_url('/', 'PUT', '{"different_string": "huehue"}')
         assert obj['data'] == 'haha'
 
         response, obj = self.call_url('/?string=huehue&integer=5')
@@ -101,3 +125,63 @@ class TestApiHandler(TestBase):
 
         response, obj = self.call_url('/404', 'DELETE')
         assert obj['error']['type'] == 'NotFoundException'
+
+    def not_implemented_test(self):
+
+        response, obj = self.call_url('/base', 'POST')
+        assert obj['error']['type'] == 'InvalidMethodException'
+
+        response, obj = self.call_url('/base', 'GET')
+        assert obj['error']['type'] == 'InvalidMethodException'
+
+        response, obj = self.call_url('/base', 'OPTIONS')
+        assert obj['error']['type'] == 'InvalidMethodException'
+
+        response, obj = self.call_url('/base', 'PATCH')
+        assert obj['error']['type'] == 'InvalidMethodException'
+
+        response, obj = self.call_url('/base', 'PUT')
+        assert obj['error']['type'] == 'InvalidMethodException'
+
+        response, obj = self.call_url('/base', 'DELETE')
+        assert obj['error']['type'] == 'InvalidMethodException'
+
+    def object_api_test(self):
+
+        valid_object = {
+            'object': {
+                'str': 'Hello World',
+                'object2': {
+                    'int': 10
+                }
+            }
+        }
+
+        response, obj = self.call_url('/object?test=true', 'POST', json.dumps(valid_object))
+        assert obj['data'] == 'haha'
+
+        invalid_object = {
+            'object': {
+                'str': 'Hello World',
+                'object2': {
+                    'int': 11
+                }
+            }
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
+
+        invalid_object = {
+            'object': 'not and object'
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
+
+        invalid_object = {
+            'object': [1, 2, 3]
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'

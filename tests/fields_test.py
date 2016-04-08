@@ -47,3 +47,24 @@ def test_string_field():
 def test_pk_field():
     field = fields.PKField()
     field.value = 'Hue'
+
+
+def test_object_field():
+
+    field = fields.ObjectField(fields={
+        'int': fields.IntegerField(max_val=10, min_val=0),
+        'string': fields.StringField(max_len=10)
+    })
+
+    try:
+        field.validate({
+            'string': 'Hello'
+        })
+
+    except ValueError, e:
+        assert e
+
+    field.validate({
+        'int': 5,
+        'string': 'Hello'
+    })

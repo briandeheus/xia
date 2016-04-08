@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/briandeheus/xia.svg?branch=master)](https://travis-ci.org/briandeheus/xia)
 
 # xia
-Python Framework for writing APIs with consistent error reporting.
+A set of Tornado Classes for writing APIs with consistent error reporting.
 
 Xia replies always follow the same format for handling succesful requests:
 
@@ -51,7 +51,7 @@ Or create your own exceptions by extending existing exceptions!
 ```
 class MyApi(xia.api.BaseApi):
 
-    REQUIRED_FIELDS = {
+    REQUIRED_GET_FIELDS = {
         'user_id': xia.fields.IntegerField(max_val=10000, min_val=1)
     }
 
@@ -170,4 +170,16 @@ class ValueInvalidException(APIException):
 ```
 
 ## Testing
-nosetests --with-coverage --cover-package=xia
+
+### Setup.py
+`python setup.py test`
+
+### With coverage
+
+Be sure to have installed the following PIP packages.
+
+* Tornado
+* Nose
+* Coverage
+
+`nosetests --with-coverage --cover-package=xia`

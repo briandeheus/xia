@@ -9,6 +9,7 @@ setup(
     author_email='me@brian.jp',
     license='MIT',
     install_requires=['tornado'],
+    test_suite='nose.collector',
     tests_require=['tornado', 'nose'],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     classifiers=[

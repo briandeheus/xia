@@ -4,14 +4,29 @@ from exceptions import \
     InvalidMethodException, \
     FormattingException, \
     NotFoundException, \
-    ValueInvalidException
+    ValueInvalidException, \
+    APIException
 
 import json
 
 
 class BaseApi(tornado.web.RequestHandler):
 
-    REQUIRED_FIELDS = {}
+    REQUIRED_GET_FIELDS = {}
+    REQUIRED_POST_FIELDS = {}
+    REQUIRED_PUT_FIELDS = {}
+    REQUIRED_PATCH_FIELDS = {}
+    REQUIRED_DELETE_FIELDS = {}
+    REQUIRED_OPTIONS_FIELDS = {}
+
+    __FIELD_MAP = {
+        'GET': REQUIRED_GET_FIELDS,
+        'POST': REQUIRED_POST_FIELDS,
+        'PUT': REQUIRED_PUT_FIELDS,
+        'PATCH': REQUIRED_PATCH_FIELDS,
+        'DELETE': REQUIRED_DELETE_FIELDS,
+        'OPTIONS': REQUIRED_OPTIONS_FIELDS,
+    }
 
     def __init__(self, *args, **kwargs):
 
@@ -25,9 +40,14 @@ class BaseApi(tornado.web.RequestHandler):
 
     def write_error(self, *args, **kwargs):
 
-        e = kwargs["exc_info"][1].serialize()
+        e = kwargs["exc_info"][1]
 
-        self.set_error(e['type'], e['message'], e['blame'])
+        if isinstance(e, APIException):
+            e = e.serialize()
+            self.set_error(e['type'], e['message'], e['blame'])
+        else:
+            self.set_error(e.__class__.__name__, e.message, 'server')
+
         self.crap_out()
 
     def set_error(self, error_type, message, blame):
@@ -47,13 +67,16 @@ class BaseApi(tornado.web.RequestHandler):
 
     def validate(self):
 
-        for field in self.REQUIRED_FIELDS:
+        fields = getattr(self, 'REQUIRED_%s_FIELDS' % self.request.method)
 
-            if self.get_argument(field, None) is None:
+        for field in fields:
+
+            if field not in self.request.arguments:
                 raise FieldMissingException(field)
 
             try:
-                self.request.arguments[field] = self.REQUIRED_FIELDS[field].validate(self.get_argument(field))
+                fields[field].validate(self.request.arguments[field])
+
             except ValueError, e:
                 raise ValueInvalidException(blame=field, message=e.message)
 
@@ -70,6 +93,11 @@ class BaseApi(tornado.web.RequestHandler):
 
     def prepare(self):
 
+        self.request.arguments = {}
+
+        for argument in self.request.query_arguments:
+            self.request.arguments[argument] = self.request.query_arguments[argument][0]
+
         if self.request.method == 'GET':
 
             self.validate()
@@ -79,6 +107,9 @@ class BaseApi(tornado.web.RequestHandler):
 
             self.validate()
             return
+
+        if self.request.body in self.request.arguments:
+            del self.request.arguments[self.request.body]
 
         try:
 
@@ -98,9 +129,6 @@ class BaseApi(tornado.web.RequestHandler):
         self.invalid_method()
 
     def options(self, *args, **kwargs):
-        self.invalid_method()
-
-    def head(self, *args, **kwargs):
         self.invalid_method()
 
     def patch(self, *args, **kwargs):
@@ -125,9 +153,6 @@ class NotFoundApi(BaseApi):
         self.not_found()
 
     def options(self, *args, **kwargs):
-        self.not_found()
-
-    def head(self, *args, **kwargs):
         self.not_found()
 
     def patch(self, *args, **kwargs):
