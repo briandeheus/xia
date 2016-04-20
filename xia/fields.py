@@ -3,20 +3,8 @@ import uuid
 
 class BaseField(object):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self._value = None
-
-        if 'optional' in kwargs:
-            self.__setattr__('optional', kwargs.get('optional'))
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self.validate(value)
-        self._value = value
 
     def validate(self, value):
         raise NotImplementedError
@@ -24,23 +12,11 @@ class BaseField(object):
     pass
 
 
-class PKField(BaseField):
-
-    def __init__(self, *args, **kwargs):
-
-        super(PKField, self).__init__(*args, **kwargs)
-
-    def validate(self, value):
-
-        if self._value is None:
-            self._value = uuid.uuid4()
-
-
 class IntegerField(BaseField):
 
-    def __init__(self, min_val, max_val, *args, **kwargs):
+    def __init__(self, min_val, max_val):
 
-        super(IntegerField, self).__init__(*args, **kwargs)
+        super(IntegerField, self).__init__()
 
         self.min_val = min_val
         self.max_val = max_val
@@ -64,7 +40,7 @@ class StringField(BaseField):
 
     def __init__(self, max_len, *args, **kwargs):
 
-        super(StringField, self).__init__(*args, **kwargs)
+        super(StringField, self).__init__()
 
         self.max_len = max_len
 
@@ -78,9 +54,9 @@ class StringField(BaseField):
 
 class ObjectField(BaseField):
 
-    def __init__(self, fields, *args, **kwargs):
+    def __init__(self, fields):
 
-        super(ObjectField, self).__init__(*args, **kwargs)
+        super(ObjectField, self).__init__()
 
         self.fields = fields
 

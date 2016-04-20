@@ -9,8 +9,8 @@ setup(
     author_email='me@brian.jp',
     license='MIT',
     install_requires=['tornado'],
+    tests_require=['tornado', 'nose', 'coverage'],
     test_suite='nose.collector',
-    tests_require=['tornado', 'nose'],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     classifiers=[
         # How mature is this project? Common values are

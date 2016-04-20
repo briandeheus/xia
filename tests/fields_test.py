@@ -5,7 +5,7 @@ def test_base_field():
     field = fields.BaseField()
 
     try:
-        field.value = 'heh'
+        field.validate('heh')
     except NotImplementedError, e:
         assert e
 
@@ -42,11 +42,6 @@ def test_string_field():
         field.value = '12345678900'
     except ValueError, e:
         assert e
-
-
-def test_pk_field():
-    field = fields.PKField()
-    field.value = 'Hue'
 
 
 def test_object_field():
