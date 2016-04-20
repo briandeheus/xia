@@ -31,6 +31,21 @@ class BreakApi(api.BaseApi):
         raise SystemError('Oh no something went wrong woo be us')
 
 
+class ObjectApi(api.BaseApi):
+
+    REQUIRED_POST_FIELDS = {
+        'object': fields.ObjectField(fields={
+            'str': fields.StringField(max_len=128),
+            'object2': fields.ObjectField(fields={
+                'int': fields.IntegerField(max_val=10, min_val=0)
+            })
+        })
+    }
+
+    def post(self):
+        self.set_data('haha')
+        self.finalize()
+
 class TestBase(AsyncHTTPTestCase):
 
     def setUp(self):
@@ -40,6 +55,7 @@ class TestBase(AsyncHTTPTestCase):
         self.app = tornado.web.Application([
             (r'/', TestApi),
             (r'/break', BreakApi),
+            (r'/object', ObjectApi),
             (r'/404', api.NotFoundApi),
             (r'/base', api.BaseApi),
         ])
@@ -155,3 +171,43 @@ class TestApiHandler(TestBase):
         response, obj = self.call_url('/break', 'GET')
         assert obj['error']['type'] == 'SystemError'
         assert response.code == 500
+
+    def object_api_test(self):
+
+        valid_object = {
+            'object': {
+                'str': 'Hello World',
+                'object2': {
+                    'int': 10
+                }
+            }
+        }
+
+        response, obj = self.call_url('/object?test=true', 'POST', json.dumps(valid_object))
+        assert obj['data'] == 'haha'
+
+        invalid_object = {
+            'object': {
+                'str': 'Hello World',
+                'object2': {
+                    'int': 11
+                }
+            }
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
+
+        invalid_object = {
+            'object': 'not and object'
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'
+
+        invalid_object = {
+            'object': [1, 2, 3]
+        }
+
+        response, obj = self.call_url('/object', 'POST', json.dumps(invalid_object))
+        assert obj['error']['type'] == 'ValueInvalidException'

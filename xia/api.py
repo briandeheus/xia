@@ -74,11 +74,12 @@ class BaseApi(tornado.web.RequestHandler):
 
         for field in fields:
 
-            if self.get_argument(field, None) is None:
+            if field not in self.request.arguments:
                 raise FieldMissingException(field)
 
             try:
-                self.request.arguments[field] = fields[field].validate(self.get_argument(field))
+                fields[field].validate(self.request.arguments[field])
+
             except ValueError, e:
                 raise ValueInvalidException(blame=field, message=e.message)
 
@@ -95,6 +96,11 @@ class BaseApi(tornado.web.RequestHandler):
 
     def prepare(self):
 
+        self.request.arguments = {}
+
+        for argument in self.request.query_arguments:
+            self.request.arguments[argument] = self.request.query_arguments[argument][0]
+
         if self.request.method == 'GET':
 
             self.validate()
@@ -104,6 +110,9 @@ class BaseApi(tornado.web.RequestHandler):
 
             self.validate()
             return
+
+        if self.request.body in self.request.arguments:
+            del self.request.arguments[self.request.body]
 
         try:
 

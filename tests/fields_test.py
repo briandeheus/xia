@@ -5,7 +5,7 @@ def test_base_field():
     field = fields.BaseField()
 
     try:
-        field.value = 'heh'
+        field.validate('heh')
     except NotImplementedError, e:
         assert e
 
@@ -44,6 +44,22 @@ def test_string_field():
         assert e
 
 
-def test_pk_field():
-    field = fields.PKField()
-    field.value = 'Hue'
+def test_object_field():
+
+    field = fields.ObjectField(fields={
+        'int': fields.IntegerField(max_val=10, min_val=0),
+        'string': fields.StringField(max_len=10)
+    })
+
+    try:
+        field.validate({
+            'string': 'Hello'
+        })
+
+    except ValueError, e:
+        assert e
+
+    field.validate({
+        'int': 5,
+        'string': 'Hello'
+    })

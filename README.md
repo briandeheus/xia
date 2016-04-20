@@ -1,5 +1,5 @@
 # xia
-Python Framework for writing APIs with consistent error reporting.
+A set of Tornado Classes for writing APIs with consistent error reporting.
 
 Xia replies always follow the same format for handling succesful requests:
 
@@ -168,4 +168,16 @@ class ValueInvalidException(APIException):
 ```
 
 ## Testing
-nosetests --with-coverage --cover-package=xia
+
+### Setup.py
+`python setup.py test`
+
+### With coverage
+
+Be sure to have installed the following PIP packages.
+
+* Tornado
+* Nose
+* Coverage
+
+`nosetests --with-coverage --cover-package=xia`
