@@ -1,6 +1,7 @@
 class APIException(Exception):
 
     MESSAGE = 'An unknown error has occured'
+    CODE = 400
 
     def __init__(self, blame=None, message=None):
         self.blame = blame
@@ -15,8 +16,14 @@ class APIException(Exception):
         }
 
 
+class ForbiddenException(APIException):
+    MESSAGE = "You do not have access to this API"
+    CODE = 403
+
+
 class NotFoundException(APIException):
     MESSAGE = 'This API does not exist'
+    CODE = 404
 
 
 class FormattingException(APIException):

@@ -43,12 +43,15 @@ class BaseApi(tornado.web.RequestHandler):
         e = kwargs["exc_info"][1]
 
         if isinstance(e, APIException):
-            e = e.serialize()
-            self.set_error(e['type'], e['message'], e['blame'])
+            serialized = e.serialize()
+            self.set_error(serialized['type'], serialized['message'], serialized['blame'])
+            code = e.CODE
+
         else:
             self.set_error(e.__class__.__name__, e.message, 'server')
+            code = 500
 
-        self.crap_out()
+        self.crap_out(code=code)
 
     def set_error(self, error_type, message, blame):
         self._error = {

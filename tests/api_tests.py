@@ -25,6 +25,12 @@ class TestApi(api.BaseApi):
         self.finalize()
 
 
+class BreakApi(api.BaseApi):
+
+    def get(self):
+        raise SystemError('Oh no something went wrong woo be us')
+
+
 class TestBase(AsyncHTTPTestCase):
 
     def setUp(self):
@@ -33,8 +39,9 @@ class TestBase(AsyncHTTPTestCase):
     def get_app(self):
         self.app = tornado.web.Application([
             (r'/', TestApi),
+            (r'/break', BreakApi),
             (r'/404', api.NotFoundApi),
-            (r'/base', api.BaseApi)
+            (r'/base', api.BaseApi),
         ])
 
         return self.app
@@ -91,41 +98,60 @@ class TestApiHandler(TestBase):
 
         response, obj = self.call_url('/404')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
         response, obj = self.call_url('/404', 'POST')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
         response, obj = self.call_url('/404', 'GET')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
         response, obj = self.call_url('/404', 'OPTIONS')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
         response, obj = self.call_url('/404', 'PATCH')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
         response, obj = self.call_url('/404', 'PUT')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
         response, obj = self.call_url('/404', 'DELETE')
         assert obj['error']['type'] == 'NotFoundException'
+        assert response.code == 404
 
     def not_implemented_test(self):
 
         response, obj = self.call_url('/base', 'POST')
         assert obj['error']['type'] == 'InvalidMethodException'
+        assert response.code == 400
 
         response, obj = self.call_url('/base', 'GET')
         assert obj['error']['type'] == 'InvalidMethodException'
+        assert response.code == 400
 
         response, obj = self.call_url('/base', 'OPTIONS')
         assert obj['error']['type'] == 'InvalidMethodException'
+        assert response.code == 400
 
         response, obj = self.call_url('/base', 'PATCH')
         assert obj['error']['type'] == 'InvalidMethodException'
+        assert response.code == 400
 
         response, obj = self.call_url('/base', 'PUT')
         assert obj['error']['type'] == 'InvalidMethodException'
+        assert response.code == 400
 
         response, obj = self.call_url('/base', 'DELETE')
         assert obj['error']['type'] == 'InvalidMethodException'
+        assert response.code == 400
+
+    def break_test(self):
+
+        response, obj = self.call_url('/break', 'GET')
+        assert obj['error']['type'] == 'SystemError'
+        assert response.code == 500
