@@ -35,6 +35,9 @@ class BaseApi(tornado.web.RequestHandler):
         self._error = None
         self._data = None
 
+    def auth(self):
+        pass
+
     def invalid_method(self):
         raise InvalidMethodException(self.request.method)
 
@@ -95,6 +98,10 @@ class BaseApi(tornado.web.RequestHandler):
         self.write(json.dumps(response))
 
     def prepare(self):
+
+        # Before anything else, authenticate.
+        # We don't want to waste CPU cycles on unauthenticated requests.
+        self.auth()
 
         self.request.arguments = {}
 
