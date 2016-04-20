@@ -63,8 +63,9 @@ class BaseApi(tornado.web.RequestHandler):
             'blame': blame
         }
 
-    def set_data(self, data):
+    def write_response(self, data):
         self._data = data
+        self.finalize()
 
     def crap_out(self, code=400):
         self.set_status(code)

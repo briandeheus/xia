@@ -55,11 +55,10 @@ class MyApi(xia.api.BaseApi):
 
     def get(self):
 
-        self.set_data({
+        self.write_response({
             'user': int(self.get_query_argument('user_id'))
         })
 
-        self.finalize()
 ```
 
 Request:
