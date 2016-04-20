@@ -57,11 +57,10 @@ class MyApi(xia.api.BaseApi):
 
     def get(self):
 
-        self.set_data({
+        self.write_response({
             'user': int(self.get_query_argument('user_id'))
         })
 
-        self.finalize()
 ```
 
 Request:
@@ -145,26 +144,28 @@ Response:
 
 ## Included Exceptions
 ```
+class ForbiddenException(APIException):
+    MESSAGE = "You do not have access to this API"
+    CODE = 403
+
+
 class NotFoundException(APIException):
     MESSAGE = 'This API does not exist'
-```
+    CODE = 404
 
-```
+
 class FormattingException(APIException):
     MESSAGE = 'We could not parse your request'
-```
 
-```
+
 class InvalidMethodException(APIException):
     MESSAGE = 'This API can not be called with this method'
-```
 
-```
+
 class FieldMissingException(APIException):
     MESSAGE = 'Field is missing'
-```
 
-```
+
 class ValueInvalidException(APIException):
     MESSAGE = 'Field value is invalid'
 ```

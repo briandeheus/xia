@@ -3,9 +3,6 @@ import uuid
 
 class BaseField(object):
 
-    def __init__(self):
-        self._value = None
-
     def validate(self, value):
         raise NotImplementedError
 
@@ -15,8 +12,6 @@ class BaseField(object):
 class IntegerField(BaseField):
 
     def __init__(self, min_val, max_val):
-
-        super(IntegerField, self).__init__()
 
         self.min_val = min_val
         self.max_val = max_val
@@ -38,10 +33,7 @@ class IntegerField(BaseField):
 
 class StringField(BaseField):
 
-    def __init__(self, max_len, *args, **kwargs):
-
-        super(StringField, self).__init__()
-
+    def __init__(self, max_len):
         self.max_len = max_len
 
     def validate(self, value):
@@ -55,9 +47,6 @@ class StringField(BaseField):
 class ObjectField(BaseField):
 
     def __init__(self, fields):
-
-        super(ObjectField, self).__init__()
-
         self.fields = fields
 
     def validate(self, value, parent=None):
@@ -71,3 +60,21 @@ class ObjectField(BaseField):
                 self.fields[field].validate(value[field])
             except KeyError:
                 raise ValueError('Missing key [%s]' % field)
+
+
+class ListField(BaseField):
+
+    def __init__(self, max_len, min_len):
+        self.max_len = max_len
+        self.min_len = min_len
+
+    def validate(self, value, parent=None):
+
+        if not isinstance(value, list):
+            raise ValueError('Value is not a list')
+
+        if len(value) < self.min_len:
+            raise ValueError('List is too short.')
+
+        if len(value) > self.max_len:
+            raise ValueError('List is too long.')

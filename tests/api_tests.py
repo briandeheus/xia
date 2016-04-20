@@ -17,12 +17,10 @@ class TestApi(api.BaseApi):
     }
 
     def get(self):
-        self.set_data('haha')
-        self.finalize()
+        self.write_response('haha')
 
     def put(self):
-        self.set_data('haha')
-        self.finalize()
+        self.write_response('haha')
 
 
 class AuthApi(api.BaseApi):
@@ -31,7 +29,7 @@ class AuthApi(api.BaseApi):
         raise exceptions.ForbiddenException()
 
     def get(self):
-        self.set_data('never seeing this')
+        self.write_response('never seeing this')
 
 
 class BreakApi(api.BaseApi):
@@ -52,8 +50,7 @@ class ObjectApi(api.BaseApi):
     }
 
     def post(self):
-        self.set_data('haha')
-        self.finalize()
+        self.write_response('haha')
 
 
 class TestBase(AsyncHTTPTestCase):

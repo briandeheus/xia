@@ -9,37 +9,52 @@ def test_base_field():
     except NotImplementedError, e:
         assert e
 
+def test_list_field():
+    field = fields.ListField(max_len=5, min_len=1)
+    has_error = False
+
+    field.validate([1])
+
+    try:
+        field.validate([])
+    except ValueError:
+        has_error = True
+
+    assert has_error
+    has_error = False
+
+    try:
+        field.validate([1, 2, 3, 4, 5, 6])
+    except ValueError:
+        has_error = True
+
+    assert has_error
 
 def test_integer_field():
     field = fields.IntegerField(max_val=10, min_val=0)
-    field.value = 5
-
-    assert field.value == 5
 
     try:
-        field.value = 11
+        field.validate(11)
     except ValueError, e:
         assert e
 
     try:
-        field.value = -1
+        field.validate(-1)
     except ValueError, e:
         assert e
 
     try:
-        field.value = 'not an integer'
+        field.validate('not an integer')
     except ValueError, e:
         assert e
 
 
 def test_string_field():
     field = fields.StringField(max_len=10)
-    field.value = '123456789'
-
-    assert field.value == '123456789'
+    field.validate('123456789')
 
     try:
-        field.value = '12345678900'
+        field.validate('12345678900')
     except ValueError, e:
         assert e
 
