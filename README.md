@@ -1,5 +1,5 @@
 # xia
-A set of Tornado Classes for writing APIs with consistent error reporting.
+A set of Tornado Classes for writing APIs with consistent response formats.
 
 Xia replies always follow the same format for handling succesful requests:
 
