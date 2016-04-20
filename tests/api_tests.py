@@ -1,5 +1,5 @@
 from tornado.testing import AsyncHTTPTestCase
-from xia import api, fields
+from xia import api, fields, exceptions
 
 import json
 import tornado.web
@@ -25,6 +25,15 @@ class TestApi(api.BaseApi):
         self.finalize()
 
 
+class AuthApi(api.BaseApi):
+
+    def auth(self):
+        raise exceptions.ForbiddenException()
+
+    def get(self):
+        self.set_data('never seeing this')
+
+
 class BreakApi(api.BaseApi):
 
     def get(self):
@@ -46,6 +55,7 @@ class ObjectApi(api.BaseApi):
         self.set_data('haha')
         self.finalize()
 
+
 class TestBase(AsyncHTTPTestCase):
 
     def setUp(self):
@@ -56,6 +66,7 @@ class TestBase(AsyncHTTPTestCase):
             (r'/', TestApi),
             (r'/break', BreakApi),
             (r'/object', ObjectApi),
+            (r'/auth', AuthApi),
             (r'/404', api.NotFoundApi),
             (r'/base', api.BaseApi),
         ])
@@ -171,6 +182,12 @@ class TestApiHandler(TestBase):
         response, obj = self.call_url('/break', 'GET')
         assert obj['error']['type'] == 'SystemError'
         assert response.code == 500
+
+    def forbidden_test(self):
+
+        response, obj = self.call_url('/auth', 'GET')
+        assert obj['error']['type'] == 'ForbiddenException'
+        assert response.code == 403
 
     def object_api_test(self):
 
