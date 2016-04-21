@@ -8,7 +8,7 @@ from exceptions import \
     APIException
 
 import json
-
+import uuid
 
 class BaseApi(tornado.web.RequestHandler):
 
@@ -35,6 +35,9 @@ class BaseApi(tornado.web.RequestHandler):
         self._error = None
         self._data = None
 
+        # Request ID that can be used for logging, auditing and debug purposes
+        self.request_id = str(uuid.uuid4())
+
     def auth(self):
         pass
 
@@ -60,7 +63,8 @@ class BaseApi(tornado.web.RequestHandler):
         self._error = {
             'type': error_type,
             'message': message,
-            'blame': blame
+            'blame': blame,
+            'request': self.request_id
         }
 
     def write_response(self, data):
