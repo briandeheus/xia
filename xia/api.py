@@ -88,7 +88,7 @@ class BaseApi(tornado.web.RequestHandler):
             try:
                 fields[field].validate(self.request.arguments[field])
 
-            except ValueError, e:
+            except ValueError as e:
                 raise ValueInvalidException(blame=field, message=e.message)
 
     def finalize(self):
