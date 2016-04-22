@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+
 import json
 import uuid
 
 import tornado.web
 
-from exceptions import \
+from .exceptions import \
     FieldMissingException, \
     InvalidMethodException, \
     FormattingException, \
