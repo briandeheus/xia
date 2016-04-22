@@ -60,7 +60,7 @@ class BaseApi(tornado.web.RequestHandler):
             code = e.CODE
 
         else:
-            self.set_error(e.__class__.__name__, e.message, 'server')
+            self.set_error(e.__class__.__name__, str(e), 'server')
             code = 500
 
         self.crap_out(code=code)
@@ -95,7 +95,7 @@ class BaseApi(tornado.web.RequestHandler):
                 fields[field].validate(self.request.arguments[field])
 
             except ValueError as e:
-                raise ValueInvalidException(blame=field, message=e.message)
+                raise ValueInvalidException(blame=field, message=str(e))
 
     def finalize(self):
         response = {}
