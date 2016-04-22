@@ -22,13 +22,13 @@ class IntegerField(BaseField):
         try:
             value = int(value)
         except ValueError:
-            raise ValueError('Value [%s] is not an integer' % value)
+            raise ValueError('Value [{}] is not an integer'.format(value))
 
         if value > self.max_val:
-            raise ValueError('Value [%s] can not be higher than %s' % (self.max_val, value))
+            raise ValueError('Value [{}] can not be higher than {}'.format(self.max_val, value))
 
         if value < self.min_val:
-            raise ValueError('Value [%s] can not be lower than %s' % (self.min_val, value))
+            raise ValueError('Value [{}] can not be lower than {}'.format(self.min_val, value))
 
 
 class StringField(BaseField):
@@ -41,7 +41,7 @@ class StringField(BaseField):
         value = str(value)
 
         if len(value) > self.max_len:
-            raise ValueError('Value [%s] can not be longer than %s' % (value, self.max_len))
+            raise ValueError('Value [{}] can not be longer than {}'.format(value, self.max_len))
 
 
 class ObjectField(BaseField):
@@ -59,7 +59,7 @@ class ObjectField(BaseField):
             try:
                 self.fields[field].validate(value[field])
             except KeyError:
-                raise ValueError('Missing key [%s]' % field)
+                raise ValueError('Missing key [{}]'.format(field))
 
 
 class ListField(BaseField):

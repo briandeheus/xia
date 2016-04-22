@@ -86,7 +86,7 @@ class BaseApi(tornado.web.RequestHandler):
 
     def validate(self):
 
-        fields = getattr(self, 'REQUIRED_%s_FIELDS' % self.request.method)
+        fields = getattr(self, 'REQUIRED_{}_FIELDS'.format(self.request.method))
 
         for field in fields:
 
