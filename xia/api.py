@@ -34,6 +34,8 @@ class BaseApi(tornado.web.RequestHandler):
         'OPTIONS': REQUIRED_OPTIONS_FIELDS,
     }
 
+    ENCODE = 'utf-8'
+
     def __init__(self, *args, **kwargs):
 
         super(BaseApi, self).__init__(*args, **kwargs)
@@ -124,17 +126,18 @@ class BaseApi(tornado.web.RequestHandler):
             self.validate()
             return
 
-        if self.request.body is None or self.request.body == '':
+        body = self.request.body.decode(self.__class__.ENCODE)
+        if body is None or body == '':
 
             self.validate()
             return
 
-        if self.request.body in self.request.arguments:
-            del self.request.arguments[self.request.body]
+        if body in self.request.arguments:
+            del self.request.arguments[body]
 
         try:
 
-            json_data = json.loads(self.request.body)
+            json_data = json.loads(body)
             self.request.arguments.update(json_data)
 
         except ValueError:
