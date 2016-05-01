@@ -1,4 +1,8 @@
+import json
+import uuid
+
 import tornado.web
+
 from exceptions import \
     FieldMissingException, \
     InvalidMethodException, \
@@ -7,8 +11,6 @@ from exceptions import \
     ValueInvalidException, \
     APIException
 
-import json
-import uuid
 
 class BaseApi(tornado.web.RequestHandler):
 
