@@ -6,8 +6,9 @@ def test_base_field():
 
     try:
         field.validate('heh')
-    except NotImplementedError, e:
+    except NotImplementedError as e:
         assert e
+
 
 def test_list_field():
     field = fields.ListField(max_len=5, min_len=1)
@@ -30,22 +31,23 @@ def test_list_field():
 
     assert has_error
 
+
 def test_integer_field():
     field = fields.IntegerField(max_val=10, min_val=0)
 
     try:
         field.validate(11)
-    except ValueError, e:
+    except ValueError as e:
         assert e
 
     try:
         field.validate(-1)
-    except ValueError, e:
+    except ValueError as e:
         assert e
 
     try:
         field.validate('not an integer')
-    except ValueError, e:
+    except ValueError as e:
         assert e
 
 
@@ -55,7 +57,7 @@ def test_string_field():
 
     try:
         field.validate('12345678900')
-    except ValueError, e:
+    except ValueError as e:
         assert e
 
 
@@ -71,7 +73,7 @@ def test_object_field():
             'string': 'Hello'
         })
 
-    except ValueError, e:
+    except ValueError as e:
         assert e
 
     field.validate({

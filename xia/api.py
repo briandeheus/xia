@@ -1,5 +1,13 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+
+import json
+import uuid
+
 import tornado.web
-from exceptions import \
+
+from .exceptions import \
     FieldMissingException, \
     InvalidMethodException, \
     FormattingException, \
@@ -7,8 +15,6 @@ from exceptions import \
     ValueInvalidException, \
     APIException
 
-import json
-import uuid
 
 class BaseApi(tornado.web.RequestHandler):
 
@@ -27,6 +33,8 @@ class BaseApi(tornado.web.RequestHandler):
         'DELETE': REQUIRED_DELETE_FIELDS,
         'OPTIONS': REQUIRED_OPTIONS_FIELDS,
     }
+
+    ENCODE = 'utf-8'
 
     def __init__(self, *args, **kwargs):
 
@@ -54,7 +62,7 @@ class BaseApi(tornado.web.RequestHandler):
             code = e.CODE
 
         else:
-            self.set_error(e.__class__.__name__, e.message, 'server')
+            self.set_error(e.__class__.__name__, str(e), 'server')
             code = 500
 
         self.crap_out(code=code)
@@ -78,7 +86,7 @@ class BaseApi(tornado.web.RequestHandler):
 
     def validate(self):
 
-        fields = getattr(self, 'REQUIRED_%s_FIELDS' % self.request.method)
+        fields = getattr(self, 'REQUIRED_{}_FIELDS'.format(self.request.method))
 
         for field in fields:
 
@@ -88,8 +96,8 @@ class BaseApi(tornado.web.RequestHandler):
             try:
                 fields[field].validate(self.request.arguments[field])
 
-            except ValueError, e:
-                raise ValueInvalidException(blame=field, message=e.message)
+            except ValueError as e:
+                raise ValueInvalidException(blame=field, message=str(e))
 
     def finalize(self):
         response = {}
@@ -118,17 +126,18 @@ class BaseApi(tornado.web.RequestHandler):
             self.validate()
             return
 
-        if self.request.body is None or self.request.body == '':
+        body = self.request.body.decode(self.__class__.ENCODE)
+        if body is None or body == '':
 
             self.validate()
             return
 
-        if self.request.body in self.request.arguments:
-            del self.request.arguments[self.request.body]
+        if body in self.request.arguments:
+            del self.request.arguments[body]
 
         try:
 
-            json_data = json.loads(self.request.body)
+            json_data = json.loads(body)
             self.request.arguments.update(json_data)
 
         except ValueError:

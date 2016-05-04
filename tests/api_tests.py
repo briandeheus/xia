@@ -73,7 +73,7 @@ class TestBase(AsyncHTTPTestCase):
     def call_url(self, url, method='GET', body=None):
 
         response = self.fetch(url, method=method, body=body, allow_nonstandard_methods=True)
-        return response, json.loads(response.body)
+        return response, json.loads(response.body.decode(api.BaseApi.ENCODE))
 
 
 class TestApiHandler(TestBase):
